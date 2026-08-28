@@ -1,0 +1,40 @@
+services:
+  backend:
+    build: ./mern_shopnest/backend
+    image: mern/backend:1.0
+    ports:
+      - "5050:5000"
+    networks:
+      - mern_network
+    environment:
+      MONGO_URI: mongodb://mongodb:27017/shopnest
+    depends_on:
+      - mongodb
+
+  frontend:
+    build:
+      context: ./mern_shopnest/frontend
+      args:
+        REACT_APP_API_URL: http://localhost:5050
+    image: mern/frontend:1.0
+    ports:
+      - "5173:80"
+    networks:
+      - mern_network
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    networks:
+      - mern_network
+    volumes:
+      - mongo-data:/data/db
+
+networks:
+  mern_network:
+    driver: bridge
+
+volumes:
+  mongo-data:
+    driver: local
