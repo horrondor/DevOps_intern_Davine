@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ProductCard from '../components/ProductCard';
+import API_URL from './config';
 
 const Home = () => {
   const [products, setProducts] = useState([]);
@@ -8,7 +9,7 @@ const Home = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch('/api/products');
+        const res = await fetch(`${API_URL}/api/products`);
         const data = await res.json();
         setProducts(data.slice(0, 4)); // Featured products
       } catch (error) {
@@ -17,6 +18,7 @@ const Home = () => {
         setLoading(false);
       }
     };
+
     fetchProducts();
   }, []);
 
@@ -26,7 +28,9 @@ const Home = () => {
         <h1>Welcome to ShopNest</h1>
         <p>Discover the best products at unbeatable prices.</p>
       </div>
+
       <h2>Featured Products</h2>
+
       {loading ? (
         <div>Loading...</div>
       ) : (
@@ -41,3 +45,6 @@ const Home = () => {
 };
 
 export default Home;
+
+
+
