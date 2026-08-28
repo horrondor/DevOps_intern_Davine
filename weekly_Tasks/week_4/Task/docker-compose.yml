@@ -8,6 +8,7 @@ services:
       - mern_network
     environment:
       MONGO_URI: mongodb://mongodb:27017/shopnest
+      FRONTEND_URL: ${FRONTEND_URL} 
     depends_on:
       - mongodb
 
@@ -15,7 +16,7 @@ services:
     build:
       context: ./mern_shopnest/frontend
       args:
-        REACT_APP_API_URL: http://localhost:5050
+        REACT_APP_API_URL: ${API_URL}
     image: mern/frontend:1.0
     ports:
       - "5173:80"
