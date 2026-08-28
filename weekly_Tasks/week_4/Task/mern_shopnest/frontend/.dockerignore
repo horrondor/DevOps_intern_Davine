@@ -1,0 +1,4 @@
+.gitiginore
+.git
+.env
+node_modules
