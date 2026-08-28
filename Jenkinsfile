@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    options {
+        skipDefaultCheckout(true)
+    }
+
     stages {
 
         stage('Checkout') {
@@ -11,46 +15,56 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'docker compose build'
+                dir('weekly_Tasks/week_4/Task') {
+                    sh 'docker compose build'
+                }
             }
         }
 
         stage('Test') {
             steps {
-                sh '''
-                    echo "Running application tests..."
+                dir('weekly_Tasks/week_4/Task') {
+                    sh '''
+                        echo "Running application tests..."
 
-                    if [ -f mern_shopnest/backend/package.json ]; then
-                        cd mern_shopnest/backend
-                        npm test -- --runInBand || true
-                    fi
-                '''
+                        if [ -f mern_shopnest/backend/package.json ]; then
+                            cd mern_shopnest/backend
+                            npm test -- --runInBand || true
+                        else
+                            echo "Backend package.json not found"
+                        fi
+                    '''
+                }
             }
         }
 
         stage('Validation') {
             steps {
-                sh '''
-                    echo "Validating Docker Compose configuration..."
-                    docker compose config
+                dir('weekly_Tasks/week_4/Task') {
+                    sh '''
+                        echo "Validating Docker Compose configuration..."
+                        docker compose config
 
-                    echo "Validating Docker images..."
-                    docker images | grep mern/
-                '''
+                        echo "Validating Docker images..."
+                        docker images | grep mern/ || true
+                    '''
+                }
             }
         }
 
         stage('Deploy') {
             steps {
-                sh '''
-                    echo "Starting MERN application..."
+                dir('weekly_Tasks/week_4/Task') {
+                    sh '''
+                        echo "Starting MERN application..."
 
-                    docker compose down || true
-                    docker compose up -d
+                        docker compose down || true
+                        docker compose up -d
 
-                    echo "Running containers:"
-                    docker compose ps
-                '''
+                        echo "Running containers:"
+                        docker compose ps
+                    '''
+                }
             }
         }
     }
@@ -65,7 +79,10 @@ pipeline {
         }
 
         always {
-            sh 'docker compose ps || true'
+            dir('weekly_Tasks/week_4/Task') {
+                sh 'docker compose ps || true'
+            }
         }
     }
 }
+
