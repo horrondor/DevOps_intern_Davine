@@ -1,0 +1,101 @@
+---
+- name: Configure Web Server
+  hosts: cloud_servers
+  become: true
+
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Install required packages
+      ansible.builtin.apt:
+        name:
+          - git
+          - curl
+          - unzip
+          - ca-certificates
+          - nginx
+        state: present
+
+    - name: Create application user
+      ansible.builtin.user:
+        name: appuser
+        shell: /bin/bash
+        create_home: true
+        state: present
+
+    - name: Create application web directory
+      ansible.builtin.file:
+        path: /var/www/app
+        state: directory
+        owner: appuser
+        group: appuser
+        mode: '0755'
+
+    - name: Create application web page
+      ansible.builtin.copy:
+        content: |
+          <!DOCTYPE html>
+          <html>
+          <head>
+              <title>DevOps Server</title>
+          </head>
+          <body>
+              <h1>Server configured using Ansible</h1>
+              <p>Application server is running successfully.</p>
+          </body>
+          </html>
+        dest: /var/www/app/index.html
+        owner: appuser
+        group: appuser
+        mode: '0644'
+
+    - name: Configure Nginx
+      ansible.builtin.copy:
+        content: |
+          server {
+              listen 80;
+              listen [::]:80;
+
+              server_name _;
+
+              root /var/www/app;
+              index index.html;
+
+              location / {
+                  try_files $uri $uri/ =404;
+              }
+          }
+        dest: /etc/nginx/sites-available/app
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Restart Nginx
+
+    - name: Enable application Nginx site
+      ansible.builtin.file:
+        src: /etc/nginx/sites-available/app
+        dest: /etc/nginx/sites-enabled/app
+        state: link
+      notify: Restart Nginx
+
+    - name: Remove default Nginx site
+      ansible.builtin.file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+      notify: Restart Nginx
+
+    - name: Ensure Nginx is enabled and running
+      ansible.builtin.systemd:
+        name: nginx
+        enabled: true
+        state: started
+
+  handlers:
+
+    - name: Restart Nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: restarted

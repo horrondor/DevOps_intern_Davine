@@ -1,0 +1,10 @@
+[servers]
+#vm1 ansible_host=192.168.56.11
+
+[cloud_servers]
+#vm2 ansible_host=3.108.227.220
+vm3 ansible_host=13.233.94.117
+
+[cloud_servers:vars]
+ansible_user=ubuntu
+ansible_ssh_private_key_file=../../Personal_access_key.pem
