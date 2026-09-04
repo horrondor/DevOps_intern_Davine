@@ -1,0 +1,12 @@
+---
+- name: Create application user
+  hosts: cloud_servers
+  become: true
+
+  tasks:
+    - name: Create appuser
+      ansible.builtin.user:
+        name: appuser
+        state: present
+        shell: /bin/bash
+        create_home: true

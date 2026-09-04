@@ -1,0 +1,11 @@
+---
+- name: Install Git package
+  hosts: cloud_servers
+  become: true
+
+  tasks:
+    - name: Install Git
+      ansible.builtin.apt:
+        name: git
+        state: present
+        update_cache: true
