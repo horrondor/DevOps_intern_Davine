@@ -1,2 +1,7 @@
 *.txt
 node_modules
+.terraform*
+.terraform.*
+terraform.tfstate*
+.venv
+Personal_access_key.pem
